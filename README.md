@@ -20,7 +20,7 @@ It's recommended that you set up a tool like `husky` to automatically run `jstoc
 
 <!-- jstoc:start -->
 
-### `./parser`
+### [`./parser`](dist/parser.d.ts)
 
 | Export                              | Description                                                              |
 | ----------------------------------- | ------------------------------------------------------------------------ |

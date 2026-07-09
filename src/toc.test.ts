@@ -38,7 +38,7 @@ test("renders a section per subpath with a table of exports", () => {
   assert.equal(
     toc,
     [
-      "### `.`",
+      "### [`.`](types/index.d.ts)",
       "",
       "| Export | Description |",
       "| ------ | ----------- |",
@@ -52,6 +52,12 @@ test("omits subpaths that have no exports", () => {
   const toc = renderTableOfContents(modules, { relativeTo: "/package" });
 
   assert.ok(!toc.includes("./empty"));
+});
+
+test("links the section heading to the module's file", () => {
+  const toc = renderTableOfContents(modules, { relativeTo: "/package" });
+
+  assert.ok(toc.startsWith("### [`.`](types/index.d.ts)"));
 });
 
 test("appends a fenced block when the document has none", () => {

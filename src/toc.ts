@@ -43,7 +43,7 @@ export function injectTableOfContents(contents: string, toc: string): string {
 
 function renderSection(module: ModuleDoc, options: RenderOptions): string {
   return [
-    `### \`${module.subpath}\``,
+    `### ${headingFor(module, options)}`,
     "",
     "| Export | Description |",
     "| ------ | ----------- |",
@@ -51,6 +51,13 @@ function renderSection(module: ModuleDoc, options: RenderOptions): string {
       (exportDoc) => `| ${linkTo(exportDoc, options)} | ${descriptionOf(exportDoc)} |`,
     ),
   ].join("\n");
+}
+
+function headingFor(module: ModuleDoc, options: RenderOptions): string {
+  const name = `\`${module.subpath}\``;
+  const target = path.relative(options.relativeTo, module.file);
+
+  return `[${name}](${target})`;
 }
 
 function linkTo(exportDoc: ExportDoc, options: RenderOptions): string {
