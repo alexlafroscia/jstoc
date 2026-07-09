@@ -1,0 +1,29 @@
+[tasks.build]
+description = "Compile TypeScript to JavaScript"
+run = "pnpm exec tsc -p config/tsconfig.src.json"
+
+[tasks.format]
+description = "Format files"
+run = "pnpm exec oxfmt"
+
+[tasks.test]
+description = "Run all tests"
+depends = [{ task = "format", args = ["--check"] }]
+
+[tasks."husky:pre-commit"]
+description = "Called by `husky` on pre-commit"
+run = "pnpm exec lint-staged -c config/lint-staged.config.json"
+hide = true
+
+[deps.pnpm]
+auto = true
+
+[deps.husky]
+auto = true
+depends = ["pnpm"]
+run = "pnpm exec husky"
+outputs = [".husky/_"]
+
+[tools]
+node = "24.14.0"
+pnpm = "11.10.0"

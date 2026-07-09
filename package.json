@@ -1,0 +1,25 @@
+{
+  "name": "jstoc",
+  "version": "1.0.0",
+  "description": "",
+  "keywords": [
+    "jsdoc",
+    "readme",
+    "table of contents"
+  ],
+  "license": "ISC",
+  "author": "Alex LaFroscia <alex@lafroscia.com>",
+  "type": "module",
+  "exports": {
+    ".": "./dist/index.js"
+  },
+  "devDependencies": {
+    "@tsconfig/node24": "^24.0.4",
+    "@types/node": "^26.1.0",
+    "husky": "^9.1.7",
+    "lint-staged": "^17.0.8",
+    "oxfmt": "^0.58.0",
+    "typescript": "^6.0.3",
+    "zod": "^4.4.3"
+  }
+}
