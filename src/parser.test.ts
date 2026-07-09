@@ -64,3 +64,19 @@ test("reads JSDoc from plain JavaScript files", async () => {
   assert.equal(shout.documentation, "Shouts a string.");
   assert.deepEqual(shout.tags, [{ name: "deprecated", text: "prefer lowercase" }]);
 });
+
+test("reads the file's `@module` comment as its documentation", async () => {
+  const modules = await parseFixture();
+
+  const util = modules.find((module) => module.subpath === "./util");
+  assert.ok(util, "the `./util` module is present");
+  assert.equal(util.documentation, "Miscellaneous string utilities.");
+});
+
+test("leaves `documentation` undefined when there is no `@module` comment", async () => {
+  const modules = await parseFixture();
+
+  const root = modules.find((module) => module.subpath === ".");
+  assert.ok(root, "the `.` module is present");
+  assert.equal(root.documentation, undefined);
+});
