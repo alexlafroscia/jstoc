@@ -42,9 +42,12 @@ export function injectTableOfContents(contents: string, toc: string): string {
 }
 
 function renderSection(module: ModuleDoc, options: RenderOptions): string {
+  const documentation = module.documentation?.trim();
+
   return [
     `### \`${module.subpath}\``,
     "",
+    ...(documentation ? [documentation, ""] : []),
     "| Export | Description |",
     "| ------ | ----------- |",
     ...module.exports.map(

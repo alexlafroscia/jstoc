@@ -36,6 +36,9 @@ export interface ModuleDoc {
   /** Absolute path of the file the exports were read from */
   file: string;
 
+  /** The description from the file's `@module` JSDoc comment, when present */
+  documentation?: string;
+
   exports: ExportDoc[];
 }
 
@@ -62,8 +65,50 @@ export function parse(entries: ResolvedEntry[]): ModuleDoc[] {
   return entries.map((entry) => ({
     subpath: entry.subpath,
     file: entry.resolvedFileName,
+    documentation: moduleDocumentationOf(program, entry.resolvedFileName),
     exports: exportsOf(program, checker, entry.resolvedFileName),
   }));
+}
+
+// Not part of TypeScript's public API surface, but exported at runtime; used
+// to parse a comment range into a JSDoc node without a full AST re-parse
+const parseIsolatedJSDocComment = (
+  ts as unknown as {
+    parseIsolatedJSDocComment: (
+      text: string,
+      start: number,
+      length: number,
+    ) => { jsDoc?: ts.JSDoc } | undefined;
+  }
+).parseIsolatedJSDocComment;
+
+/**
+ * Read the file's `@module` JSDoc comment, if it has one: a comment tagged
+ * `@module` that appears before any code
+ */
+function moduleDocumentationOf(program: ts.Program, fileName: string): string | undefined {
+  const sourceFile = program.getSourceFile(fileName);
+
+  if (!sourceFile) {
+    return undefined;
+  }
+
+  const commentRanges = ts.getLeadingCommentRanges(sourceFile.text, 0) ?? [];
+
+  for (const range of commentRanges) {
+    if (sourceFile.text.slice(range.pos, range.pos + 3) !== "/**") {
+      continue;
+    }
+
+    const { jsDoc } =
+      parseIsolatedJSDocComment(sourceFile.text, range.pos, range.end - range.pos) ?? {};
+
+    if (jsDoc?.tags?.some((tag) => tag.tagName.text === "module")) {
+      return ts.getTextOfJSDocComment(jsDoc.comment) ?? "";
+    }
+  }
+
+  return undefined;
 }
 
 function exportsOf(program: ts.Program, checker: ts.TypeChecker, fileName: string): ExportDoc[] {
