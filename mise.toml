@@ -6,9 +6,23 @@ run = "pnpm exec tsc -p config/tsconfig.src.json"
 description = "Format files"
 run = "pnpm exec oxfmt"
 
+[tasks.bin]
+description = "Run the executable exposed by this package"
+run = "node ./dist/bin.js"
+depends = ["build"]
+
 [tasks.test]
 description = "Run all tests"
-depends = [{ task = "format", args = ["--check"] }]
+run = [{ task = "format", args = ["--check"] }, { task = "typecheck" }, { task = "test:unit" }]
+
+[tasks."test:unit"]
+description = "Run unit tests through Node"
+run = "node --experimental-strip-types --test 'src/**/*.test.ts'"
+
+[tasks.typecheck]
+description = "Run type-checking"
+run = "pnpm exec tsc -p config/tsconfig.test.json"
+depends = ["build"]
 
 [tasks."husky:pre-commit"]
 description = "Called by `husky` on pre-commit"

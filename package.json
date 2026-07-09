@@ -1,7 +1,7 @@
 {
   "name": "jstoc",
   "version": "1.0.0",
-  "description": "",
+  "description": "Generate a Markdown table of contents from your package's exports field",
   "keywords": [
     "jsdoc",
     "readme",
@@ -9,17 +9,27 @@
   ],
   "license": "ISC",
   "author": "Alex LaFroscia <alex@lafroscia.com>",
+  "bin": {
+    "jstoc": "./dist/bin.js"
+  },
+  "files": [
+    "dist",
+    "!dist/*.tsbuildinfo",
+    "src"
+  ],
   "type": "module",
   "exports": {
-    ".": "./dist/index.js"
+    "./parser": "./dist/parser.js"
+  },
+  "dependencies": {
+    "typescript": "^6.0.3",
+    "zod": "^4.4.3"
   },
   "devDependencies": {
     "@tsconfig/node24": "^24.0.4",
     "@types/node": "^26.1.0",
     "husky": "^9.1.7",
     "lint-staged": "^17.0.8",
-    "oxfmt": "^0.58.0",
-    "typescript": "^6.0.3",
-    "zod": "^4.4.3"
+    "oxfmt": "^0.58.0"
   }
 }

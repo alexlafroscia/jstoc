@@ -3,8 +3,11 @@
   "compilerOptions": {
     "types": ["node"],
 
+    "rootDir": "../src",
+
     // Allow importing `.ts` files
-    "allowImportingTsExtensions": true,
-    "rewriteRelativeImportExtensions": true
+    // `src` will rewrite to `.js` in build output
+    // `test` will import `.ts` directly
+    "allowImportingTsExtensions": true
   }
 }

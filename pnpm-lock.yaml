@@ -7,6 +7,13 @@ settings:
 importers:
 
   .:
+    dependencies:
+      typescript:
+        specifier: ^6.0.3
+        version: 6.0.3
+      zod:
+        specifier: ^4.4.3
+        version: 4.4.3
     devDependencies:
       '@tsconfig/node24':
         specifier: ^24.0.4
@@ -23,12 +30,6 @@ importers:
       oxfmt:
         specifier: ^0.58.0
         version: 0.58.0
-      typescript:
-        specifier: ^6.0.3
-        version: 6.0.3
-      zod:
-        specifier: ^4.4.3
-        version: 4.4.3
 
 packages:
 
