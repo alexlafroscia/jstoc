@@ -4,7 +4,7 @@ import * as path from "node:path";
 
 import { parse } from "./parser.ts";
 import { resolve } from "./resolver.ts";
-import { injectTableOfContents, renderTableOfContents } from "./toc.ts";
+import { detectHeadingLevel, injectTableOfContents, renderTableOfContents } from "./toc.ts";
 
 const [packageJsonArg, readmeArg] = process.argv.slice(2);
 
@@ -20,16 +20,17 @@ for (const warning of warnings) {
   console.error(`warning: ${warning}`);
 }
 
-const toc = renderTableOfContents(parse(entries), {
-  relativeTo: path.dirname(readmePath),
-});
-
 const readme = await fs.readFile(readmePath, { encoding: "utf8" }).catch((error) => {
   if (error.code === "ENOENT") {
     return "";
   }
 
   throw error;
+});
+
+const toc = renderTableOfContents(parse(entries), {
+  relativeTo: path.dirname(readmePath),
+  headingLevel: detectHeadingLevel(readme),
 });
 
 await fs.writeFile(readmePath, injectTableOfContents(readme, toc));

@@ -2,7 +2,13 @@ import * as assert from "node:assert/strict";
 import { test } from "node:test";
 
 import type { ModuleDoc } from "./parser.ts";
-import { END_FENCE, injectTableOfContents, renderTableOfContents, START_FENCE } from "./toc.ts";
+import {
+  detectHeadingLevel,
+  END_FENCE,
+  injectTableOfContents,
+  renderTableOfContents,
+  START_FENCE,
+} from "./toc.ts";
 
 const modules: ModuleDoc[] = [
   {
@@ -75,4 +81,30 @@ test("replaces the contents of an existing fence", () => {
     result,
     `# My Package\n\n${START_FENCE}\n\nfresh\n\n${END_FENCE}\n\nTrailing prose.\n`,
   );
+});
+
+test("renders sections at the requested heading level", () => {
+  const toc = renderTableOfContents(modules, { relativeTo: "/package", headingLevel: 2 });
+
+  assert.ok(toc.startsWith("## `.`"));
+});
+
+test("detects one level deeper than the nearest heading above the fence", () => {
+  const contents = `# Title\n\n## API\n\n${START_FENCE}\n\nstale\n\n${END_FENCE}\n`;
+
+  assert.equal(detectHeadingLevel(contents), 3);
+});
+
+test("ignores headings that come after the fence", () => {
+  const contents = `# Title\n\n#### Deep\n\n${START_FENCE}\n\nstale\n\n${END_FENCE}\n\n## After\n`;
+
+  assert.equal(detectHeadingLevel(contents), 5);
+});
+
+test("falls back to a level-3 heading when nothing precedes the fence", () => {
+  assert.equal(detectHeadingLevel("Some prose with no headings.\n"), 3);
+});
+
+test("caps at a level-6 heading", () => {
+  assert.equal(detectHeadingLevel("###### Deepest\n"), 6);
 });
