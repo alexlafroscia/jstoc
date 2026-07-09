@@ -29,6 +29,10 @@ test("extracts JSDoc for each exported symbol", async () => {
     { name: "returns", text: "the sum of both numbers" },
   ]);
 
+  const multiply = root.exports.find((exportDoc) => exportDoc.name === "multiply");
+  assert.ok(multiply, "`multiply` is exported");
+  assert.deepEqual(multiply.tags, [{ name: "summary", text: "Multiplies two numbers." }]);
+
   const undocumented = root.exports.find((exportDoc) => exportDoc.name === "undocumented");
   assert.ok(undocumented, "`undocumented` is exported");
   assert.equal(undocumented.kind, "variable");
