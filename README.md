@@ -24,7 +24,7 @@ It's recommended that you set up a tool like `husky` to automatically run `jstoc
 
 | Export                              | Description                                                              |
 | ----------------------------------- | ------------------------------------------------------------------------ |
-| [`parse`](dist/parser.d.ts#L36)     | Extract the JSDoc documentation for every symbol exported from the given |
+| [`parse`](dist/parser.d.ts#L38)     | Extract the JSDoc documentation for every symbol exported from the given |
 | [`JSDocTag`](dist/parser.d.ts#L2)   |                                                                          |
 | [`ExportDoc`](dist/parser.d.ts#L8)  |                                                                          |
 | [`ModuleDoc`](dist/parser.d.ts#L22) |                                                                          |

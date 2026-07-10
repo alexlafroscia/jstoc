@@ -60,6 +60,39 @@ test("omits subpaths that have no exports", () => {
   assert.ok(!toc.includes("./empty"));
 });
 
+test("renders module documentation under the heading, before the table", () => {
+  const documented: ModuleDoc[] = [
+    {
+      subpath: "./documented",
+      file: "/package/lib/documented.js",
+      documentation: "Utilities for doing a thing.",
+      exports: [
+        {
+          name: "doThing",
+          kind: "function",
+          documentation: "Does the thing.",
+          tags: [],
+        },
+      ],
+    },
+  ];
+
+  const toc = renderTableOfContents(documented, { relativeTo: "/package" });
+
+  assert.equal(
+    toc,
+    [
+      "### `./documented`",
+      "",
+      "Utilities for doing a thing.",
+      "",
+      "| Export | Description |",
+      "| ------ | ----------- |",
+      "| `doThing` | Does the thing. |",
+    ].join("\n"),
+  );
+});
+
 test("appends a fenced block when the document has none", () => {
   const result = injectTableOfContents("# My Package\n\nSome prose.\n", "TOC");
 

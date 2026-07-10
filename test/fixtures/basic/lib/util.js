@@ -1,4 +1,10 @@
 /**
+ * Miscellaneous string utilities.
+ *
+ * @module
+ */
+
+/**
  * Shouts a string.
  *
  * @deprecated prefer lowercase
