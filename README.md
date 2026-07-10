@@ -22,6 +22,12 @@ A JS API is also provided if you want more control over the process. The details
 
 <!-- jstoc:start -->
 
+### `./resolver`
+
+| Export                           | Description                                                                                            |
+| -------------------------------- | ------------------------------------------------------------------------------------------------------ |
+| [`resolve`](src/resolver.ts#L41) | Resolve each subpath of a package's `exports` field to the file that documentation should be read from |
+
 ### `./parser`
 
 | Export                       | Description                                                                           |

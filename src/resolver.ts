@@ -5,6 +5,7 @@ import ts from "typescript";
 
 import { PackageJSON } from "./package-json.ts";
 
+/** @ignore hide from jstoc */
 export interface ResolvedEntry {
   /** The `exports` key, e.g. `"."` or `"./parser"` */
   subpath: string;
@@ -16,6 +17,7 @@ export interface ResolvedEntry {
   isDeclarationFile: boolean;
 }
 
+/** @ignore hide from jstoc */
 export interface ResolveResult {
   entries: ResolvedEntry[];
 
