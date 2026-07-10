@@ -24,6 +24,22 @@ description = "Run type-checking"
 run = "pnpm exec tsc -p config/tsconfig.test.json"
 depends = ["build"]
 
+[tasks.changeset]
+description = "Create a changeset to add to the changelog"
+run = "pnpm exec changeset"
+
+[tasks."changeset:version"]
+description = "Apply pending changesets"
+run = "pnpm exec changeset version"
+depends_post = ["format"]
+hide = true
+
+[tasks."changeset:release"]
+description = "Publish a release using `changesets`"
+run = "pnpm exec changeset publish"
+depends = ["build"]
+hide = true
+
 [tasks."husky:pre-commit"]
 description = "Called by `husky` on pre-commit"
 run = [
