@@ -2,9 +2,9 @@
 
 Generate a "table of contents" for your JS package from your JSDoc comments.
 
-Reads your `package.json#exports` configuration to automatically detect your package's exports to help you make sure nothing is missing!
+`jstoc` reads your `package.json#exports` configuration to detect what your package actually exposes to users, leveraging source- or declaration maps where necessary to trace your build output back to the source code to link to. JSDoc comments are parsed to provide a description of each function
 
-## Usage
+## CLI Usage
 
 Run the `jstoc` executable, providing a path to your `package.json` and `README.md` if they are not in the standard location:
 
@@ -17,6 +17,8 @@ The generated contents will be inserted between "fence" comments containing `jst
 It's recommended that you set up a tool like `husky` to automatically run `jstoc` as part of your pre-commit hooks.
 
 ## Module API
+
+A JS API is also provided if you want more control over the process. The details below are generated using `jstoc`!
 
 <!-- jstoc:start -->
 
