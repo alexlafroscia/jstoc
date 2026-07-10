@@ -14,7 +14,7 @@
     "url": "git+https://github.com/alexlafroscia/jstoc.git"
   },
   "bin": {
-    "jstoc": "./dist/bin.js"
+    "jstoc": "dist/bin.js"
   },
   "files": [
     "dist",
