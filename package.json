@@ -9,6 +9,10 @@
   ],
   "license": "ISC",
   "author": "Alex LaFroscia <alex@lafroscia.com>",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/alexlafroscia/jstoc.git"
+  },
   "bin": {
     "jstoc": "./dist/bin.js"
   },
@@ -21,6 +25,10 @@
   "exports": {
     "./resolver": "./dist/resolver.js",
     "./parser": "./dist/parser.js"
+  },
+  "scripts": {
+    "prepack": "mise run pnpm:prepack",
+    "postpack": "mise run pnpm:postpack"
   },
   "dependencies": {
     "@jridgewell/trace-mapping": "^0.3.31",

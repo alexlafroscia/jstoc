@@ -1,0 +1,49 @@
+#!/usr/bin/env node
+//MISE description="Rewrite relative README links to absolute GitHub URLs for publishing"
+//MISE hide=true
+//MISE depends=["build"]
+
+import { execFileSync } from "node:child_process";
+import { readFileSync, writeFileSync } from "node:fs";
+
+import { format } from "oxfmt";
+
+// `postpack` restores README.md from git, so refuse to run if doing so would
+// discard uncommitted changes
+try {
+  execFileSync("git", ["diff", "--quiet", "README.md"]);
+} catch {
+  console.error("README.md has uncommitted changes; commit them before packing");
+  process.exit(1);
+}
+
+const { repository } = JSON.parse(readFileSync("package.json", "utf8"));
+const url = typeof repository === "string" ? repository : repository?.url;
+if (!url) throw new Error("package.json is missing a `repository` field");
+
+const match =
+  url.match(/github\.com[/:]([^/]+)\/([^/#?]+)/) ??
+  url.match(/^(?:github:)?([^:/]+)\/([^/#?]+)$/);
+if (!match) throw new Error(`Could not find a github.com repo in: ${url}`);
+
+const sha = execFileSync("git", ["rev-parse", "HEAD"], { encoding: "utf8" }).trim();
+
+const [, owner, name] = match;
+const base = `https://github.com/${owner}/${name.replace(/\.git$/, "")}/blob/${sha}`;
+
+const readme = readFileSync("README.md", "utf8");
+const rewritten = readme.replaceAll(
+  /\]\((?![a-z][a-z+.-]*:|\/\/|#)([^)]+)\)/g,
+  (_, path) => `](${base}/${path})`,
+);
+const config = JSON.parse(readFileSync(".oxfmtrc.json", "utf8"));
+
+const { code, errors } = await format("README.md", rewritten, config);
+if (errors.length > 0) {
+  for (const error of errors) {
+    console.error(error.codeframe ?? error.message);
+  }
+  process.exit(1);
+}
+
+writeFileSync("README.md", code);
