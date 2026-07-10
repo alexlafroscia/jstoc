@@ -17,7 +17,7 @@ run = [{ task = "format", args = ["--check"] }, { task = "typecheck" }, { task =
 
 [tasks."test:unit"]
 description = "Run unit tests through Node"
-run = "node --experimental-strip-types --test 'src/**/*.test.ts'"
+run = "node --experimental-strip-types --test 'src/**/*.test.ts' 'test/**/*.test.ts'"
 
 [tasks.typecheck]
 description = "Run type-checking"

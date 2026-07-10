@@ -1,0 +1,8 @@
+{
+  "name": "fixture-javascript",
+  "type": "module",
+  "exports": {
+    ".": "./lib/index.js",
+    "./util": "./lib/util.js"
+  }
+}

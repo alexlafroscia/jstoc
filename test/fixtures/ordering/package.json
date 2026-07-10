@@ -1,0 +1,9 @@
+{
+  "name": "fixture-ordering",
+  "type": "module",
+  "exports": {
+    "./zebra": "./lib/zebra.js",
+    ".": "./lib/index.js",
+    "./alpha": "./lib/alpha.js"
+  }
+}

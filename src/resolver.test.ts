@@ -4,25 +4,21 @@ import { test } from "node:test";
 
 import { resolve } from "./resolver.ts";
 
-const fixturePath = path.join(import.meta.dirname, "../test/fixtures/basic/package.json");
+function fixturePath(name: string): string {
+  return path.join(import.meta.dirname, `../test/fixtures/${name}/package.json`);
+}
 
-test("resolves each subpath through the `exports` field", async () => {
-  const { entries } = await resolve(fixturePath);
-  const bySubpath = new Map(entries.map((entry) => [entry.subpath, entry]));
+test("prefers the `types` condition and flags declaration files", async () => {
+  const { entries } = await resolve(fixturePath("typescript"));
 
-  const root = bySubpath.get(".");
+  const root = entries.find((entry) => entry.subpath === ".");
   assert.ok(root, "the `.` subpath resolves");
-  assert.match(root.resolvedFileName, /types\/index\.d\.ts$/);
+  assert.match(root.resolvedFileName, /dist\/index\.d\.ts$/);
   assert.equal(root.isDeclarationFile, true);
-
-  const util = bySubpath.get("./util");
-  assert.ok(util, "the `./util` subpath resolves");
-  assert.match(util.resolvedFileName, /lib\/util\.js$/);
-  assert.equal(util.isDeclarationFile, false);
 });
 
 test("warns about wildcard subpaths", async () => {
-  const { entries, warnings } = await resolve(fixturePath);
+  const { entries, warnings } = await resolve(fixturePath("wildcard"));
 
   assert.ok(warnings.some((warning) => warning.includes("./wild/*")));
   assert.ok(!entries.some((entry) => entry.subpath.includes("*")));

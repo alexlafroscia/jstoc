@@ -148,17 +148,36 @@ function exportsOf(program: ts.Program, checker: ts.TypeChecker, fileName: strin
           : exportSymbol;
 
       return {
-        name,
-        kind: kindOf(symbol),
-        documentation: ts.displayPartsToString(symbol.getDocumentationComment(checker)),
-        tags: symbol.getJsDocTags(checker).map((tag) => ({
-          name: tag.name,
-          text: ts.displayPartsToString(tag.text),
-        })),
-        location: locationOf(symbol),
+        order: orderOf(exportSymbol, sourceFile),
+        exportDoc: {
+          name,
+          kind: kindOf(symbol),
+          documentation: ts.displayPartsToString(symbol.getDocumentationComment(checker)),
+          tags: symbol.getJsDocTags(checker).map((tag) => ({
+            name: tag.name,
+            text: ts.displayPartsToString(tag.text),
+          })),
+          location: locationOf(symbol),
+        },
       };
     })
+    .sort((a, b) => a.order - b.order)
+    .map(({ exportDoc }) => exportDoc)
     .filter((exportDoc) => !exportDoc.tags.some((tag) => tag.name === "ignore"));
+}
+
+/**
+ * Where an export appears in the entry file, so results can be listed in
+ * source order; the checker does not guarantee declaration order
+ */
+function orderOf(exportSymbol: ts.Symbol, sourceFile: ts.SourceFile): number {
+  const declaration = exportSymbol
+    .getDeclarations()
+    ?.find((declaration) => declaration.getSourceFile() === sourceFile);
+
+  // `export *` re-exports have no declaration of their own in the entry
+  // file; keep them after the file's own declarations
+  return declaration?.getStart() ?? Number.MAX_SAFE_INTEGER;
 }
 
 function kindOf(symbol: ts.Symbol): string {

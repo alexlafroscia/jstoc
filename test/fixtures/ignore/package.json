@@ -1,0 +1,5 @@
+{
+  "name": "fixture-ignore",
+  "type": "module",
+  "exports": "./index.js"
+}

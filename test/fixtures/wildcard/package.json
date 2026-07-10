@@ -1,0 +1,8 @@
+{
+  "name": "fixture-wildcard",
+  "type": "module",
+  "exports": {
+    ".": "./index.js",
+    "./wild/*": "./lib/*.js"
+  }
+}
