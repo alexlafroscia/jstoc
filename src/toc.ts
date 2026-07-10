@@ -10,6 +10,32 @@ const FENCE_PATTERN = new RegExp(`${START_FENCE}[\\s\\S]*?${END_FENCE}`);
 export interface RenderOptions {
   /** Directory that links should be relative to; usually the README's own */
   relativeTo: string;
+
+  /** Heading level (number of `#`) each subpath section should render at; defaults to `3` */
+  headingLevel?: number;
+}
+
+const HEADING_PATTERN = /^(#{1,6})(?:\s|$)/;
+
+/**
+ * Find the heading level table-of-contents sections should render at: one
+ * level deeper than the nearest heading above the injection point, falling
+ * back to `###` when no heading precedes it
+ */
+export function detectHeadingLevel(contents: string): number {
+  const fenceMatch = FENCE_PATTERN.exec(contents);
+  const searchArea = fenceMatch ? contents.slice(0, fenceMatch.index) : contents;
+  const lines = searchArea.split("\n");
+
+  for (let index = lines.length - 1; index >= 0; index--) {
+    const match = HEADING_PATTERN.exec(lines[index]);
+
+    if (match) {
+      return Math.min(match[1].length + 1, 6);
+    }
+  }
+
+  return 3;
 }
 
 /**
@@ -42,10 +68,11 @@ export function injectTableOfContents(contents: string, toc: string): string {
 }
 
 function renderSection(module: ModuleDoc, options: RenderOptions): string {
+  const heading = "#".repeat(options.headingLevel ?? 3);
   const documentation = module.documentation?.trim();
 
   return [
-    `### \`${module.subpath}\``,
+    `${heading} \`${module.subpath}\``,
     "",
     ...(documentation ? [documentation, ""] : []),
     "| Export | Description |",
