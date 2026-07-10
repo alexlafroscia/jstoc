@@ -1,6 +1,8 @@
 [tasks.build]
 description = "Compile TypeScript to JavaScript"
 run = "pnpm exec tsc -p config/tsconfig.src.json"
+sources = ["src/**/*", "config/tsconfig.base.json", "config/tsconfig.src.json"]
+outputs = ["dist/**/*"]
 
 [tasks.format]
 description = "Format files"
