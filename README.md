@@ -22,11 +22,11 @@ It's recommended that you set up a tool like `husky` to automatically run `jstoc
 
 ### `./parser`
 
-| Export                              | Description                                                              |
-| ----------------------------------- | ------------------------------------------------------------------------ |
-| [`parse`](dist/parser.d.ts#L38)     | Extract the JSDoc documentation for every symbol exported from the given |
-| [`JSDocTag`](dist/parser.d.ts#L2)   |                                                                          |
-| [`ExportDoc`](dist/parser.d.ts#L8)  |                                                                          |
-| [`ModuleDoc`](dist/parser.d.ts#L22) |                                                                          |
+| Export                           | Description                                                              |
+| -------------------------------- | ------------------------------------------------------------------------ |
+| [`parse`](src/parser.ts#L53)     | Extract the JSDoc documentation for every symbol exported from the given |
+| [`JSDocTag`](src/parser.ts#L6)   |                                                                          |
+| [`ExportDoc`](src/parser.ts#L14) |                                                                          |
+| [`ModuleDoc`](src/parser.ts#L33) |                                                                          |
 
 <!-- jstoc:end -->
