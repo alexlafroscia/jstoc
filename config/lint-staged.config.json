@@ -1,3 +1,0 @@
-{
-  "*": "pnpm exec oxfmt --no-error-on-unmatched-pattern"
-}

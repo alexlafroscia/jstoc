@@ -6,8 +6,8 @@ run = "pnpm exec tsc -p config/tsconfig.src.json"
 description = "Format files"
 run = "pnpm exec oxfmt"
 
-[tasks.bin]
-description = "Run the executable exposed by this package"
+[tasks.jstoc]
+description = "Run the `jstoc` executable"
 run = "node ./dist/bin.js"
 depends = ["build"]
 
@@ -42,11 +42,7 @@ hide = true
 
 [tasks."husky:pre-commit"]
 description = "Called by `husky` on pre-commit"
-run = [
-  { task = "bin" },
-  "git add README.md",
-  "pnpm exec lint-staged -c config/lint-staged.config.json",
-]
+run = "pnpm exec lint-staged -c config/lint-staged.config.mjs"
 hide = true
 
 [deps.pnpm]
