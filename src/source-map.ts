@@ -1,92 +1,24 @@
 import * as fs from "node:fs";
-import * as path from "node:path";
 
-interface ParsedSourceMap {
-  sources: string[];
-  sourceRoot?: string;
+import { originalPositionFor, TraceMap } from "@jridgewell/trace-mapping";
 
-  /** One entry per generated line; each is a `[genColumn, sourceIndex, sourceLine, sourceColumn]` tuple */
-  mappings: number[][][];
-}
+const cache = new Map<string, TraceMap | undefined>();
 
-const cache = new Map<string, ParsedSourceMap | undefined>();
-
-const BASE64_ALPHABET = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
-
-function decodeVLQ(segment: string): number[] {
-  const fields: number[] = [];
-  let shift = 0;
-  let value = 0;
-
-  for (const char of segment) {
-    const digit = BASE64_ALPHABET.indexOf(char);
-    const continues = (digit & 32) !== 0;
-
-    value += (digit & 31) << shift;
-
-    if (continues) {
-      shift += 5;
-      continue;
-    }
-
-    fields.push(value & 1 ? -(value >>> 1) : value >>> 1);
-    value = 0;
-    shift = 0;
-  }
-
-  return fields;
-}
-
-// Source-map columns/lines are deltas from the previous field of the same
-// kind; `sourceIndex`/`sourceLine`/`sourceColumn` accumulate across the
-// whole file, while `genColumn` resets at the start of every line
-function parseMappings(mappings: string): number[][][] {
-  let sourceIndex = 0;
-  let sourceLine = 0;
-  let sourceColumn = 0;
-
-  return mappings.split(";").map((line) => {
-    let genColumn = 0;
-
-    return (line.length === 0 ? [] : line.split(","))
-      .map((rawSegment) => decodeVLQ(rawSegment))
-      .filter((fields) => fields.length >= 4)
-      .map((fields) => {
-        genColumn += fields[0] ?? 0;
-        sourceIndex += fields[1] ?? 0;
-        sourceLine += fields[2] ?? 0;
-        sourceColumn += fields[3] ?? 0;
-
-        return [genColumn, sourceIndex, sourceLine, sourceColumn];
-      });
-  });
-}
-
-function loadSourceMap(mapPath: string): ParsedSourceMap | undefined {
+function loadSourceMap(mapPath: string): TraceMap | undefined {
   if (cache.has(mapPath)) {
     return cache.get(mapPath);
   }
 
-  let parsed: ParsedSourceMap | undefined;
+  let map: TraceMap | undefined;
 
   try {
-    const raw: unknown = JSON.parse(fs.readFileSync(mapPath, "utf8"));
-
-    if (typeof raw === "object" && raw !== null && "mappings" in raw) {
-      const map = raw as { sources?: unknown; sourceRoot?: unknown; mappings?: unknown };
-
-      parsed = {
-        sources: Array.isArray(map.sources) ? map.sources : [],
-        sourceRoot: typeof map.sourceRoot === "string" ? map.sourceRoot : undefined,
-        mappings: parseMappings(typeof map.mappings === "string" ? map.mappings : ""),
-      };
-    }
+    map = new TraceMap(fs.readFileSync(mapPath, "utf8"), mapPath);
   } catch {
-    parsed = undefined;
+    map = undefined;
   }
 
-  cache.set(mapPath, parsed);
-  return parsed;
+  cache.set(mapPath, map);
+  return map;
 }
 
 /**
@@ -105,28 +37,17 @@ export function traceToSource(
   }
 
   const map = loadSourceMap(mapPath);
-  const segments = map?.mappings[line];
 
-  if (!map || !segments || segments.length === 0) {
+  if (!map) {
     return undefined;
   }
 
-  // Find the segment covering `character`: the last one starting at or before it
-  let match = segments[0];
-  for (const segment of segments) {
-    if (segment[0] > character) break;
-    match = segment;
-  }
+  // `originalPositionFor` expects a 1-based line and 0-based column
+  const position = originalPositionFor(map, { line: line + 1, column: character });
 
-  const [, sourceIndex, sourceLine] = match;
-  const source = map.sources[sourceIndex];
-
-  if (source === undefined) {
+  if (position.source === null || position.line === null) {
     return undefined;
   }
 
-  return {
-    file: path.resolve(path.dirname(mapPath), map.sourceRoot ?? "", source),
-    line: sourceLine + 1,
-  };
+  return { file: position.source, line: position.line };
 }
