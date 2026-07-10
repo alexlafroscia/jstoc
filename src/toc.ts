@@ -96,13 +96,25 @@ function linkTo(exportDoc: ExportDoc, options: RenderOptions): string {
 }
 
 /**
- * The brief description of an export: the `@summary` tag when present,
- * falling back to the first line of the JSDoc comment
+ * The brief description of an export, in order of precedence: the full
+ * `@summary` tag; the first sentence of the JSDoc comment, up to a period;
+ * or the comment's first paragraph, up to an empty line
  */
 function descriptionOf(exportDoc: ExportDoc): string {
   const summary = exportDoc.tags.find((tag) => tag.name === "summary");
-  const description = summary ? summary.text : (exportDoc.documentation.split("\n", 1)[0] ?? "");
+  const description = summary ? summary.text : implicitSummaryOf(exportDoc.documentation);
 
   // Keep the description on a single line and inside its table cell
   return description.replaceAll(/\s+/g, " ").replaceAll("|", "\\|").trim();
+}
+
+/**
+ * The first sentence of the comment or its first paragraph, whichever ends
+ * first; a sentence may wrap across lines, but never past an empty line
+ */
+function implicitSummaryOf(documentation: string): string {
+  const paragraph = documentation.split(/\n\s*\n/, 1)[0] ?? "";
+  const sentence = /^[\s\S]*?\./.exec(paragraph);
+
+  return sentence ? sentence[0] : paragraph;
 }

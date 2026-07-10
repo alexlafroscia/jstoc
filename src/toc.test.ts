@@ -54,6 +54,48 @@ test("renders a section per subpath with a table of exports", () => {
   );
 });
 
+test("cuts the implicit summary at the first period, even across wrapped lines", () => {
+  const wrapped: ModuleDoc[] = [
+    {
+      subpath: ".",
+      file: "/package/lib/index.js",
+      exports: [
+        {
+          name: "example",
+          kind: "function",
+          documentation: "A sentence that wraps\nonto a second line. A follow-up sentence.",
+          tags: [],
+        },
+      ],
+    },
+  ];
+
+  const toc = renderTableOfContents(wrapped, { relativeTo: "/package" });
+
+  assert.ok(toc.includes("| `example` | A sentence that wraps onto a second line. |"));
+});
+
+test("uses the whole first paragraph when it contains no period", () => {
+  const unpunctuated: ModuleDoc[] = [
+    {
+      subpath: ".",
+      file: "/package/lib/index.js",
+      exports: [
+        {
+          name: "example",
+          kind: "function",
+          documentation: "A description that wraps\nwithout punctuation\n\nMore detail. Not shown.",
+          tags: [],
+        },
+      ],
+    },
+  ];
+
+  const toc = renderTableOfContents(unpunctuated, { relativeTo: "/package" });
+
+  assert.ok(toc.includes("| `example` | A description that wraps without punctuation |"));
+});
+
 test("omits subpaths that have no exports", () => {
   const toc = renderTableOfContents(modules, { relativeTo: "/package" });
 
