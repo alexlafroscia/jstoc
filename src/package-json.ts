@@ -1,6 +1,6 @@
 import * as zod from "zod";
 
-type ExportValue = string | null | ExportValue[] | { [key: string]: ExportValue };
+export type ExportValue = string | null | ExportValue[] | { [key: string]: ExportValue };
 
 const ExportValue: zod.ZodType<ExportValue> = zod.lazy(() =>
   zod.union([

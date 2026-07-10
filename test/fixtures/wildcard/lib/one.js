@@ -1,4 +1,4 @@
 /**
- * Reached only through the wildcard subpath, so never documented.
+ * Reached through the wildcard subpath.
  */
 export function one() {}

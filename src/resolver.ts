@@ -3,7 +3,7 @@ import * as path from "node:path";
 
 import ts from "typescript";
 
-import { PackageJSON } from "./package-json.ts";
+import { type ExportValue, PackageJSON } from "./package-json.ts";
 
 /** @ignore hide from jstoc */
 export interface ResolvedEntry {
@@ -58,36 +58,114 @@ export async function resolve(packageJsonPath: string): Promise<ResolveResult> {
 
   for (const subpath of subpathsOf(packageJson.exports)) {
     if (subpath.includes("*")) {
-      warnings.push(`wildcard subpath "${subpath}" is not yet supported`);
+      const exportValue = (packageJson.exports as Record<string, ExportValue>)[subpath];
+      const concreteSubpaths = await enumerateWildcardSubpaths(subpath, exportValue, packageDir);
+
+      if (concreteSubpaths.length === 0) {
+        warnings.push(`wildcard subpath "${subpath}" did not match any files`);
+        continue;
+      }
+
+      for (const concreteSubpath of concreteSubpaths) {
+        resolveSubpath(concreteSubpath, packageJson.name, containingFile, entries, warnings);
+      }
+
       continue;
     }
 
-    const specifier =
-      subpath === "." ? packageJson.name : `${packageJson.name}/${subpath.slice(2)}`;
-
-    const { resolvedModule } = ts.resolveModuleName(
-      specifier,
-      containingFile,
-      COMPILER_OPTIONS,
-      ts.sys,
-      undefined,
-      undefined,
-      ts.ModuleKind.ESNext,
-    );
-
-    if (!resolvedModule) {
-      warnings.push(`subpath "${subpath}" could not be resolved to a file`);
-      continue;
-    }
-
-    entries.push({
-      subpath,
-      resolvedFileName: resolvedModule.resolvedFileName,
-      isDeclarationFile: /\.d\.[cm]?ts$/.test(resolvedModule.resolvedFileName),
-    });
+    resolveSubpath(subpath, packageJson.name, containingFile, entries, warnings);
   }
 
   return { entries, warnings };
+}
+
+/**
+ * Resolve a single, concrete (non-wildcard) subpath to the file that
+ * documentation should be read from, recording the result in `entries` or a
+ * failure in `warnings`
+ */
+function resolveSubpath(
+  subpath: string,
+  packageName: string,
+  containingFile: string,
+  entries: ResolvedEntry[],
+  warnings: string[],
+): void {
+  const specifier = subpath === "." ? packageName : `${packageName}/${subpath.slice(2)}`;
+
+  const { resolvedModule } = ts.resolveModuleName(
+    specifier,
+    containingFile,
+    COMPILER_OPTIONS,
+    ts.sys,
+    undefined,
+    undefined,
+    ts.ModuleKind.ESNext,
+  );
+
+  if (!resolvedModule) {
+    warnings.push(`subpath "${subpath}" could not be resolved to a file`);
+    return;
+  }
+
+  entries.push({
+    subpath,
+    resolvedFileName: resolvedModule.resolvedFileName,
+    isDeclarationFile: /\.d\.[cm]?ts$/.test(resolvedModule.resolvedFileName),
+  });
+}
+
+/**
+ * Expand a wildcard subpath (e.g. `"./wild/*"`) into the concrete subpaths
+ * (e.g. `"./wild/one"`) implied by the files on disk that match the
+ * pattern(s) it maps to
+ */
+async function enumerateWildcardSubpaths(
+  subpath: string,
+  exportValue: ExportValue,
+  packageDir: string,
+): Promise<string[]> {
+  const concreteSubpaths = new Set<string>();
+
+  for (const pattern of patternsOf(exportValue)) {
+    const glob = pattern.replace(/^\.\//, "");
+    const matcher = new RegExp(`^${escapeRegExp(pattern).replace("\\*", "(.+)")}$`);
+
+    for await (const match of fs.glob(glob, { cwd: packageDir })) {
+      const normalized = `./${match.split(path.sep).join("/")}`;
+      const captured = matcher.exec(normalized)?.[1];
+
+      if (captured !== undefined) {
+        concreteSubpaths.add(subpath.replace("*", captured));
+      }
+    }
+  }
+
+  return [...concreteSubpaths].sort();
+}
+
+/**
+ * Collect every string pattern reachable from an `exports` value, e.g. every
+ * condition's target when a wildcard subpath maps to a conditions object
+ */
+function patternsOf(value: ExportValue): string[] {
+  if (typeof value === "string") {
+    return value.includes("*") ? [value] : [];
+  }
+
+  if (Array.isArray(value)) {
+    return value.flatMap(patternsOf);
+  }
+
+  if (value !== null && typeof value === "object") {
+    return Object.values(value).flatMap(patternsOf);
+  }
+
+  return [];
+}
+
+function escapeRegExp(value: string): string {
+  return value.replaceAll(/[.*+?^${}()|[\]\\]/g, "\\$&");
 }
 
 /**
