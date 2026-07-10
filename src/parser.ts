@@ -1,6 +1,7 @@
 import ts from "typescript";
 
 import type { ResolvedEntry } from "./resolver.ts";
+import { traceToSource } from "./source-map.ts";
 
 export interface JSDocTag {
   /** The tag name, without the `@`, e.g. `"param"` or `"deprecated"` */
@@ -169,10 +170,13 @@ function locationOf(symbol: ts.Symbol): ExportDoc["location"] {
   }
 
   const sourceFile = declaration.getSourceFile();
-  const { line } = sourceFile.getLineAndCharacterOfPosition(declaration.getStart());
+  const { line, character } = sourceFile.getLineAndCharacterOfPosition(declaration.getStart());
 
-  return {
-    file: sourceFile.fileName,
-    line: line + 1,
-  };
+  // Prefer the original source location when a declaration map traces back to one
+  return (
+    traceToSource(sourceFile.fileName, line, character) ?? {
+      file: sourceFile.fileName,
+      line: line + 1,
+    }
+  );
 }

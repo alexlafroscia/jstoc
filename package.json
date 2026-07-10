@@ -22,6 +22,7 @@
     "./parser": "./dist/parser.js"
   },
   "dependencies": {
+    "@jridgewell/trace-mapping": "^0.3.31",
     "typescript": "^6.0.3",
     "zod": "^4.4.3"
   },
