@@ -12,6 +12,12 @@ Common tasks:
 - `mise run typecheck` — run type-checking
 - `mise run format` — format files
 
+`pnpm` commands should always be executed through `mise exec` (e.g. `mise exec -- pnpm install`), so they use the tool versions pinned in `mise.toml`.
+
+## Changesets
+
+Important changes should always have a changeset generated for them (via `mise changeset`, or by adding a markdown file under `.changeset/`) so they are included in the changelog and trigger a release.
+
 ## Testing
 
 - Tests are written using the built-in `node:test` setup (run via `mise run test:unit`).
