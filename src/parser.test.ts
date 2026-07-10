@@ -40,6 +40,16 @@ test("extracts JSDoc for each exported symbol", async () => {
   assert.deepEqual(undocumented.tags, []);
 });
 
+test("omits exports tagged `@ignore`", async () => {
+  const modules = await parseFixture();
+
+  const root = modules.find((module) => module.subpath === ".");
+  assert.ok(root, "the `.` module is present");
+
+  const hidden = root.exports.find((exportDoc) => exportDoc.name === "hidden");
+  assert.equal(hidden, undefined, "`hidden` is not included");
+});
+
 test("follows re-exports to the documented declaration", async () => {
   const modules = await parseFixture();
 

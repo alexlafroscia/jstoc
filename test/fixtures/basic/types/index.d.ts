@@ -17,4 +17,11 @@ export declare function multiply(a: number, b: number): number;
 
 export declare const undocumented: string;
 
+/**
+ * An internal helper that should be hidden from documentation.
+ *
+ * @ignore
+ */
+export declare function hidden(): void;
+
 export { greet } from "./greet.js";

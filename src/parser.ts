@@ -3,6 +3,9 @@ import ts from "typescript";
 import type { ResolvedEntry } from "./resolver.ts";
 import { traceToSource } from "./source-map.ts";
 
+/**
+ * @ignore hide from jstoc output
+ */
 export interface JSDocTag {
   /** The tag name, without the `@`, e.g. `"param"` or `"deprecated"` */
   name: string;
@@ -11,6 +14,9 @@ export interface JSDocTag {
   text: string;
 }
 
+/**
+ * @ignore hide from jstoc output
+ */
 export interface ExportDoc {
   /** The name the symbol is exported under */
   name: string;
@@ -30,6 +36,9 @@ export interface ExportDoc {
   };
 }
 
+/**
+ * @ignore hide from jstoc output
+ */
 export interface ModuleDoc {
   /** The `exports` key this module was reached through, e.g. `"./parser"` */
   subpath: string;
@@ -48,7 +57,8 @@ export interface ModuleDoc {
  * entry points
  *
  * Re-exports (`export { x } from`, `export * from`) are followed to the
- * declaration that actually carries the documentation.
+ * declaration that actually carries the documentation. Exports tagged
+ * `@ignore` are omitted.
  */
 export function parse(entries: ResolvedEntry[]): ModuleDoc[] {
   const program = ts.createProgram(
@@ -126,26 +136,29 @@ function exportsOf(program: ts.Program, checker: ts.TypeChecker, fileName: strin
     return [];
   }
 
-  return checker.getExportsOfModule(moduleSymbol).map((exportSymbol) => {
-    const name = exportSymbol.getName();
+  return checker
+    .getExportsOfModule(moduleSymbol)
+    .map((exportSymbol) => {
+      const name = exportSymbol.getName();
 
-    // Re-exports are aliases; hop to the declaration carrying the JSDoc
-    const symbol =
-      exportSymbol.flags & ts.SymbolFlags.Alias
-        ? checker.getAliasedSymbol(exportSymbol)
-        : exportSymbol;
+      // Re-exports are aliases; hop to the declaration carrying the JSDoc
+      const symbol =
+        exportSymbol.flags & ts.SymbolFlags.Alias
+          ? checker.getAliasedSymbol(exportSymbol)
+          : exportSymbol;
 
-    return {
-      name,
-      kind: kindOf(symbol),
-      documentation: ts.displayPartsToString(symbol.getDocumentationComment(checker)),
-      tags: symbol.getJsDocTags(checker).map((tag) => ({
-        name: tag.name,
-        text: ts.displayPartsToString(tag.text),
-      })),
-      location: locationOf(symbol),
-    };
-  });
+      return {
+        name,
+        kind: kindOf(symbol),
+        documentation: ts.displayPartsToString(symbol.getDocumentationComment(checker)),
+        tags: symbol.getJsDocTags(checker).map((tag) => ({
+          name: tag.name,
+          text: ts.displayPartsToString(tag.text),
+        })),
+        location: locationOf(symbol),
+      };
+    })
+    .filter((exportDoc) => !exportDoc.tags.some((tag) => tag.name === "ignore"));
 }
 
 function kindOf(symbol: ts.Symbol): string {

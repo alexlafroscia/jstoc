@@ -24,11 +24,8 @@ A JS API is also provided if you want more control over the process. The details
 
 ### `./parser`
 
-| Export                           | Description                                                              |
-| -------------------------------- | ------------------------------------------------------------------------ |
-| [`parse`](src/parser.ts#L53)     | Extract the JSDoc documentation for every symbol exported from the given |
-| [`JSDocTag`](src/parser.ts#L6)   |                                                                          |
-| [`ExportDoc`](src/parser.ts#L14) |                                                                          |
-| [`ModuleDoc`](src/parser.ts#L33) |                                                                          |
+| Export                       | Description                                                              |
+| ---------------------------- | ------------------------------------------------------------------------ |
+| [`parse`](src/parser.ts#L63) | Extract the JSDoc documentation for every symbol exported from the given |
 
 <!-- jstoc:end -->
