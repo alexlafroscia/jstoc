@@ -1,5 +1,5 @@
 ---
-"jstoc": major
+"@alexlafroscia/jstoc": major
 ---
 
 Initial Release

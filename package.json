@@ -1,5 +1,5 @@
 {
-  "name": "jstoc",
+  "name": "@alexlafroscia/jstoc",
   "version": "0.1.0",
   "description": "Generate a Markdown table of contents from your package's exports field",
   "keywords": [
