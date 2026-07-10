@@ -1,0 +1,7 @@
+{
+  "name": "fixture-re-exports",
+  "type": "module",
+  "exports": {
+    ".": "./lib/index.js"
+  }
+}

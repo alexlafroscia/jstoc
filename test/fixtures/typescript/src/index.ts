@@ -9,3 +9,5 @@ export function double(value: number): number {
  * The value that `double` multiplies by.
  */
 export const FACTOR = 2;
+
+export type { DoubleOptions } from "./options.js";
