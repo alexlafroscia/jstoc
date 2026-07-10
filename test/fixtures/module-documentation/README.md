@@ -1,6 +1,6 @@
 <!-- jstoc:start -->
 
-### `.`
+### [`.`](index.js)
 
 Helpers for working with dates, described above the table of exports.
 

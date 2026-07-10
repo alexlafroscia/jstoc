@@ -22,6 +22,16 @@ function loadSourceMap(mapPath: string): TraceMap | undefined {
 }
 
 /**
+ * Trace a generated file back through its `.map` file to the original source
+ * file it was produced from, when a declaration/source map is available
+ */
+export function traceFileToSource(generatedFile: string): string | undefined {
+  const map = loadSourceMap(`${generatedFile}.map`);
+
+  return map?.resolvedSources[0] ?? undefined;
+}
+
+/**
  * Trace a position in a generated file back through its `.map` file to the
  * original source location, when a declaration/source map is available
  */

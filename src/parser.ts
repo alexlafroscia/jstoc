@@ -1,7 +1,7 @@
 import ts from "typescript";
 
 import type { ResolvedEntry } from "./resolver.ts";
-import { traceToSource } from "./source-map.ts";
+import { traceFileToSource, traceToSource } from "./source-map.ts";
 
 /**
  * @ignore hide from jstoc output
@@ -43,7 +43,11 @@ export interface ModuleDoc {
   /** The `exports` key this module was reached through, e.g. `"./parser"` */
   subpath: string;
 
-  /** Absolute path of the file the exports were read from */
+  /**
+   * Absolute path of the module's file; the original source file when a
+   * declaration map traces back to one, otherwise the file the exports were
+   * read from
+   */
   file: string;
 
   /** The description from the file's `@module` JSDoc comment, when present */
@@ -75,7 +79,7 @@ export function parse(entries: ResolvedEntry[]): ModuleDoc[] {
 
   return entries.map((entry) => ({
     subpath: entry.subpath,
-    file: entry.resolvedFileName,
+    file: traceFileToSource(entry.resolvedFileName) ?? entry.resolvedFileName,
     documentation: moduleDocumentationOf(program, entry.resolvedFileName),
     exports: exportsOf(program, checker, entry.resolvedFileName),
   }));

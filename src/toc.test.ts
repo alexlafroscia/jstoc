@@ -44,7 +44,7 @@ test("renders a section per subpath with a table of exports", () => {
   assert.equal(
     toc,
     [
-      "### `.`",
+      "### [`.`](types/index.d.ts)",
       "",
       "| Export | Description |",
       "| ------ | ----------- |",
@@ -82,7 +82,7 @@ test("renders module documentation under the heading, before the table", () => {
   assert.equal(
     toc,
     [
-      "### `./documented`",
+      "### [`./documented`](lib/documented.js)",
       "",
       "Utilities for doing a thing.",
       "",
@@ -119,7 +119,7 @@ test("replaces the contents of an existing fence", () => {
 test("renders sections at the requested heading level", () => {
   const toc = renderTableOfContents(modules, { relativeTo: "/package", headingLevel: 2 });
 
-  assert.ok(toc.startsWith("## `.`"));
+  assert.ok(toc.startsWith("## [`.`](types/index.d.ts)"));
 });
 
 test("detects one level deeper than the nearest heading above the fence", () => {

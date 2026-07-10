@@ -69,10 +69,11 @@ export function injectTableOfContents(contents: string, toc: string): string {
 
 function renderSection(module: ModuleDoc, options: RenderOptions): string {
   const heading = "#".repeat(options.headingLevel ?? 3);
+  const target = path.relative(options.relativeTo, module.file);
   const documentation = module.documentation?.trim();
 
   return [
-    `${heading} \`${module.subpath}\``,
+    `${heading} [\`${module.subpath}\`](${target})`,
     "",
     ...(documentation ? [documentation, ""] : []),
     "| Export | Description |",

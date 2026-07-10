@@ -1,6 +1,6 @@
 <!-- jstoc:start -->
 
-### `.`
+### [`.`](lib/index.js)
 
 | Export                             | Description                |
 | ---------------------------------- | -------------------------- |
@@ -8,7 +8,7 @@
 | [`undocumented`](lib/index.js#L12) |                            |
 | [`greet`](lib/greet.js#L4)         | Greets someone by name.    |
 
-### `./util`
+### [`./util`](lib/util.js)
 
 Miscellaneous string utilities.
 
