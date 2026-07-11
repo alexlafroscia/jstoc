@@ -1,6 +1,6 @@
 {
   "name": "@alexlafroscia/jstoc",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Generate a Markdown table of contents from your package's exports field",
   "keywords": [
     "jsdoc",
