@@ -16,7 +16,6 @@ jobs:
       - uses: jdx/mise-action@v4
         with:
           experimental: true
-      - run: mise run build
       - run: mise run jstoc
       - run: mise run format
       - uses: cbeck88/check-dirty-git@v1
