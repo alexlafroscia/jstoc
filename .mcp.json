@@ -1,0 +1,10 @@
+{
+  "mcpServers": {
+    "mise": {
+      "type": "stdio",
+      "command": "mise",
+      "args": ["mcp"],
+      "env": {}
+    }
+  }
+}

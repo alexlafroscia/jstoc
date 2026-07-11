@@ -14,6 +14,8 @@ Common tasks:
 
 `pnpm` commands should always be executed through `mise exec` (e.g. `mise exec -- pnpm install`), so they use the tool versions pinned in `mise.toml`.
 
+If available, leverage the `mise` MCP to execute tasks.
+
 ## Changesets
 
 Important changes should always have a changeset generated for them (via `mise changeset`, or by adding a markdown file under `.changeset/`) so they are included in the changelog and trigger a release.
