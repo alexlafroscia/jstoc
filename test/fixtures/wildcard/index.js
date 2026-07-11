@@ -1,4 +1,4 @@
 /**
- * The only export that appears; the wildcard subpath is skipped.
+ * Exported from the root subpath, alongside the wildcard-resolved entries.
  */
 export function visible() {}
