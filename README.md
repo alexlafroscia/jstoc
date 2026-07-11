@@ -21,7 +21,7 @@ pnpm exec jstoc ./package.json ./README.md
 
 The generated contents will be inserted between "fence" comments containing `jstoc:start` and `jstoc:end`, respectively. These will be inserted for you automatically the first time you run the tool.
 
-It's recommended that you set up tools like `husky` and `lint-staged` to automatically run `jstoc` as part of your pre-commit hooks. Check out [this package's configuration](./config/lint-staged.config.mjs#L10-L14) for an example. You may also want to ensure that running `jstoc` does not result in a change to your README as part of your package's CI.
+It's recommended that you set up tools like `husky` and `lint-staged` to automatically run `jstoc` as part of your pre-commit hooks. Check out [this package's configuration](./config/lint-staged.config.mjs#L10-L14) for an example. You may also want to ensure that running `jstoc` does not result in a change to your README as part of [your package's CI](./.github/workflows/ci.yml#19-21).
 
 ## Module API
 
