@@ -50,14 +50,16 @@ test("renders a section per subpath with a table of exports", () => {
       "| ------ | ----------- |",
       "| [`add`](types/index.d.ts#L8) | Adds two numbers together. |",
       "| [`multiply`](types/index.d.ts#L16) | Multiplies two numbers. |",
+      "",
+      "### [`./empty`](lib/empty.js)",
     ].join("\n"),
   );
 });
 
-test("omits subpaths that have no exports", () => {
+test("renders a subpath with no exports as a heading without a table", () => {
   const toc = renderTableOfContents(modules, { relativeTo: "/package" });
 
-  assert.ok(!toc.includes("./empty"));
+  assert.ok(toc.endsWith("### [`./empty`](lib/empty.js)"));
 });
 
 test("renders module documentation under the heading, before the table", () => {

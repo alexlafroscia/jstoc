@@ -62,7 +62,8 @@ export interface ModuleDoc {
  *
  * Re-exports (`export { x } from`, `export * from`) are followed to the
  * declaration that actually carries the documentation. Exports tagged
- * `@ignore` are omitted.
+ * `@ignore` are omitted, as are modules whose `@module` comment carries the
+ * tag.
  */
 export function parse(entries: ResolvedEntry[]): ModuleDoc[] {
   const program = ts.createProgram(
@@ -77,12 +78,20 @@ export function parse(entries: ResolvedEntry[]): ModuleDoc[] {
   );
   const checker = program.getTypeChecker();
 
-  return entries.map((entry) => ({
-    subpath: entry.subpath,
-    file: traceFileToSource(entry.resolvedFileName) ?? entry.resolvedFileName,
-    documentation: moduleDocumentationOf(program, entry.resolvedFileName),
-    exports: exportsOf(program, checker, entry.resolvedFileName),
-  }));
+  return entries.flatMap((entry) => {
+    const moduleComment = moduleCommentOf(program, entry.resolvedFileName);
+
+    if (moduleComment?.ignored) {
+      return [];
+    }
+
+    return {
+      subpath: entry.subpath,
+      file: traceFileToSource(entry.resolvedFileName) ?? entry.resolvedFileName,
+      documentation: moduleComment?.documentation,
+      exports: exportsOf(program, checker, entry.resolvedFileName),
+    };
+  });
 }
 
 // Not part of TypeScript's public API surface, but exported at runtime; used
@@ -97,11 +106,19 @@ const parseIsolatedJSDocComment = (
   }
 ).parseIsolatedJSDocComment;
 
+interface ModuleComment {
+  /** The description from the comment, without any tags */
+  documentation: string;
+
+  /** Whether the comment also carries an `@ignore` tag */
+  ignored: boolean;
+}
+
 /**
  * Read the file's `@module` JSDoc comment, if it has one: a comment tagged
  * `@module` that appears before any code
  */
-function moduleDocumentationOf(program: ts.Program, fileName: string): string | undefined {
+function moduleCommentOf(program: ts.Program, fileName: string): ModuleComment | undefined {
   const sourceFile = program.getSourceFile(fileName);
 
   if (!sourceFile) {
@@ -119,7 +136,10 @@ function moduleDocumentationOf(program: ts.Program, fileName: string): string | 
       parseIsolatedJSDocComment(sourceFile.text, range.pos, range.end - range.pos) ?? {};
 
     if (jsDoc?.tags?.some((tag) => tag.tagName.text === "module")) {
-      return ts.getTextOfJSDocComment(jsDoc.comment) ?? "";
+      return {
+        documentation: ts.getTextOfJSDocComment(jsDoc.comment) ?? "",
+        ignored: jsDoc.tags.some((tag) => tag.tagName.text === "ignore"),
+      };
     }
   }
 

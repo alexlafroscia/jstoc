@@ -1,0 +1,9 @@
+{
+  "name": "fixture-ignored-modules",
+  "type": "module",
+  "exports": {
+    "./bin": "./bin.js",
+    "./internal": "./internal.js",
+    "./hidden": "./hidden.js"
+  }
+}

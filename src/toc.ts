@@ -43,10 +43,7 @@ export function detectHeadingLevel(contents: string): number {
  * per subpath, each followed by a table linking every export to its source
  */
 export function renderTableOfContents(modules: ModuleDoc[], options: RenderOptions): string {
-  return modules
-    .filter((module) => module.exports.length > 0)
-    .map((module) => renderSection(module, options))
-    .join("\n\n");
+  return modules.map((module) => renderSection(module, options)).join("\n\n");
 }
 
 /**
@@ -74,13 +71,19 @@ function renderSection(module: ModuleDoc, options: RenderOptions): string {
 
   return [
     `${heading} [\`${module.subpath}\`](${target})`,
-    "",
-    ...(documentation ? [documentation, ""] : []),
-    "| Export | Description |",
-    "| ------ | ----------- |",
-    ...module.exports.map(
-      (exportDoc) => `| ${linkTo(exportDoc, options)} | ${descriptionOf(exportDoc)} |`,
-    ),
+    ...(documentation ? ["", documentation] : []),
+    // A module can be listed even when every export is hidden; skip the table
+    // rather than render one with no rows
+    ...(module.exports.length > 0
+      ? [
+          "",
+          "| Export | Description |",
+          "| ------ | ----------- |",
+          ...module.exports.map(
+            (exportDoc) => `| ${linkTo(exportDoc, options)} | ${descriptionOf(exportDoc)} |`,
+          ),
+        ]
+      : []),
   ].join("\n");
 }
 
